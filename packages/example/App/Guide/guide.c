@@ -6,6 +6,8 @@
 #include <pthread.h>
 #include "key.h"
 #include "queue.h"
+#include "play.h"
+
 /*
  * Define
  * */
@@ -19,7 +21,7 @@ static pthread_t keyThread;
 static pthread_t playThread;
 static int readKeyFlag = 0;
 
-#define DEBUG_X86
+//#define DEBUG_X86
 //X86_ESC: stop read
 //X86_ZERO: put music num into queue
 
@@ -77,7 +79,7 @@ static int Init()
 	if(res) {
 		return -1;
 	}
-	
+	InitPlay();
 	InitQueue();
 	
 	readKeyFlag = 1;
@@ -100,7 +102,7 @@ void *PlayThreadHandle(void *arg)
 				playCmd = Pop(&keyQueue);
 			break;
 			case KEYQUEUE_FREE:
-			//keyqueue NULL, locationQueue not NULl
+			//keyqueue NULL, locationQueue not NULL
 				printf("KEYQUEUE_FREE\n");
 				playCmd = Pop(&locationQueue);
 			break;
@@ -115,6 +117,7 @@ void *PlayThreadHandle(void *arg)
 		if (playCmd != PLAYCMD_INIT_STAT) {
 			//Handle playCmd && reset playCmd
 			printf("PlayThreadHandle: playCmd = %d\n", playCmd);
+			StartPlay(playCmd);
 			playCmd = PLAYCMD_INIT_STAT;
 		}
 	}

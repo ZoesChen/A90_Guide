@@ -1,7 +1,7 @@
 #ifndef _GUIDE_KEY_H_
 #define _GUIDE_KEY_H_
 
-#define KEY_DEVICE "/dev/input/event3"
+#define KEY_DEVICE "/dev/input/event0"
 #define X86_ESC   1
 #define X86_KEY1 2
 #define X86_KEY2 3

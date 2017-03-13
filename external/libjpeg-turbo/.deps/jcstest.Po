@@ -1,0 +1,76 @@
+jcstest.o: jcstest.c \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/stdio.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/features.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/stdc-predef.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/predefs.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/sys/cdefs.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/wordsize.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/gnu/stubs.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/sgidefs.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/gnu/stubs-o32.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../lib/gcc/mips-linux-gnu/4.7.2/include/stddef.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/types.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/typesizes.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/libio.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/_G_config.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/wchar.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../lib/gcc/mips-linux-gnu/4.7.2/include/stdarg.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/stdio_lim.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/sys_errlist.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/stdio.h \
+ jpeglib.h jconfig.h jmorecfg.h jerror.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/setjmp.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/setjmp.h \
+ /home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/sigset.h
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/stdio.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/features.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/stdc-predef.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/predefs.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/sys/cdefs.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/wordsize.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/gnu/stubs.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/sgidefs.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/gnu/stubs-o32.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../lib/gcc/mips-linux-gnu/4.7.2/include/stddef.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/types.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/typesizes.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/libio.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/_G_config.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/wchar.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../lib/gcc/mips-linux-gnu/4.7.2/include/stdarg.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/stdio_lim.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/sys_errlist.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/stdio.h:
+
+jpeglib.h:
+
+jconfig.h:
+
+jmorecfg.h:
+
+jerror.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/setjmp.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/setjmp.h:
+
+/home/zoe/ChiGoo/A90_Guide/prebuilts/toolchains/mips-gcc472-glibc216/bin/../mips-linux-gnu/libc/usr/include/bits/sigset.h:

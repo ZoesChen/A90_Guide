@@ -4,7 +4,8 @@ CFLAGS  := -Wall -O2
 LIBS 	:= -lpthread
 
 OBJS := guide.o		\
-	key.o
+	key.o	\
+	queue.o
 
 guide: $(OBJS)
 	$(CROSS)gcc $^ $(LIBS) -o $@

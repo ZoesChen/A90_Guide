@@ -22,4 +22,4 @@ $(SHLIB): mixer.o pcm.o
 
 .PHONY:clean
 clean:
-	rm -rf *.o guide
+	rm -rf *.o guide $(SHLIB)

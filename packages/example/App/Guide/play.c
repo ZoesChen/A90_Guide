@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include "play.h"
-
+#define DEBUG
 /*
  * Parameter
  * */
@@ -23,12 +23,13 @@ static unsigned int rate;
 static unsigned int bits;
 static unsigned int is_raw; /* Default wav file */
 static int more_chunks;
+static int closeFlag;
 static pthread_t musicThread;
 
 static char musicName[32][128] = {
-		"/mnt/sd/back/0.wav"
+		"/mnt/sd/back/0.wav",
 		"/mnt/sd/back/1.wav",
-		"/mnt/sd/back/2.wav"
+		"/mnt/sd/back/2.wav",
 		"/mnt/sd/back/4.wav"
 };
 /*
@@ -42,6 +43,13 @@ char *matchMusic(int musicNum);
 void play_sample(FILE *file, unsigned int card, unsigned int device, unsigned int channels,
                  unsigned int rate, unsigned int bits, unsigned int period_size,
                  unsigned int period_count);
+                 
+int sample_is_playable(unsigned int card, unsigned int device, unsigned int channels,
+                        unsigned int rate, unsigned int bits, unsigned int period_size,
+                        unsigned int period_count);
+                        
+static int check_param(struct pcm_params *params, unsigned int param, unsigned int value,
+                 char *param_name, char *param_unit);
 
 int StartPlay(int musicNum)
 {
@@ -51,7 +59,12 @@ int StartPlay(int musicNum)
 		printf("Can not match music!\n");
 		return -1;
 	}
-	
+	file = fopen(musicName, "rb");
+	if (file == NULL) {
+		printf("Open %s fail\n", musicName);
+		return -1;
+	}
+
 	if (!is_raw) {
 		fread(&riffWaveHeader, sizeof(struct riff_wave_header), 1, file);
 		if ((riffWaveHeader.riff_id != ID_RIFF) || (riffWaveHeader.wave_id != ID_WAVE)) {
@@ -64,6 +77,7 @@ int StartPlay(int musicNum)
 			switch (chunkHeader.id) {
             case ID_FMT:
                 fread(&chunkFmt, sizeof(struct chunk_fmt), 1, file);
+                printf("%s: chunkHeader.sz = %d\n", __FUNCTION__, chunkHeader.sz);
                 /* If the format header is larger, skip the rest */
                 if (chunkHeader.sz > sizeof(struct chunk_fmt))
                     fseek(file, chunkHeader.sz - sizeof(struct chunk_fmt), SEEK_CUR);
@@ -80,8 +94,13 @@ int StartPlay(int musicNum)
 		channels = chunkFmt.num_channels;
 		rate = chunkFmt.sample_rate;
 		bits = chunkFmt.bits_per_sample;
+		
 	}
+	printf("%s %d\n", __FUNCTION__, __LINE__);
+	printf("%s: hannels=%d, rate=%d, bits=%d, period_size=%d, period_count=%d\n", 
+		__FUNCTION__, channels, rate, bits, period_size, period_count);
 	play_sample(file, card, device, channels, rate, bits, period_size, period_count);
+	printf("%s %d\n", __FUNCTION__, __LINE__);
 	fclose(file);
 	return 0;
 }
@@ -97,6 +116,7 @@ void InitPlay()
 	bits = 16;
 	is_raw = 0;
 	more_chunks = 1;
+	closeFlag = 0;
 }
 
 char *matchMusic(int musicNum)
@@ -139,11 +159,16 @@ void play_sample(FILE *file, unsigned int card, unsigned int device, unsigned in
     config.stop_threshold = 0;
     config.silence_threshold = 0;
 
-    //if (!sample_is_playable(card, device, channels, rate, bits, period_size, period_count)) {
-    //    return;
-    //}
+    if (!sample_is_playable(card, device, channels, rate, bits, period_size, period_count)) {
+        return;
+    }
 
     pcm = pcm_open(card, device, PCM_OUT, &config);
+    
+#ifdef DEBUG
+	printf("");
+#endif
+    
     if (!pcm || !pcm_is_ready(pcm)) {
         fprintf(stderr, "Unable to open PCM device %u (%s)\n",
                 device, pcm_get_error(pcm));
@@ -163,6 +188,7 @@ void play_sample(FILE *file, unsigned int card, unsigned int device, unsigned in
 
     do {
         num_read = fread(buffer, 1, size, file);
+        printf("%s: num_read = %d\n", __FUNCTION__, num_read);
         if (num_read > 0) {
 	    if (pcm_write(pcm, buffer, num_read)) {
                 fprintf(stderr, "Error playing sample\n");
@@ -175,8 +201,56 @@ void play_sample(FILE *file, unsigned int card, unsigned int device, unsigned in
                 break;
             }
 	}
-    } while (!close && num_read > 0);
+    } while (!closeFlag && num_read > 0);
 
     free(buffer);
     pcm_close(pcm);
+}
+
+int sample_is_playable(unsigned int card, unsigned int device, unsigned int channels,
+                        unsigned int rate, unsigned int bits, unsigned int period_size,
+                        unsigned int period_count)
+{
+    struct pcm_params *params;
+    int can_play;
+
+    params = pcm_params_get(card, device, PCM_OUT);
+    if (params == NULL) {
+        fprintf(stderr, "Unable to open PCM device %u.\n", device);
+        return 0;
+    }
+
+    can_play = check_param(params, PCM_PARAM_RATE, rate, "Sample rate", "Hz");
+    can_play &= check_param(params, PCM_PARAM_CHANNELS, channels, "Sample", " channels");
+    can_play &= check_param(params, PCM_PARAM_SAMPLE_BITS, bits, "Bitrate", " bits");
+    can_play &= check_param(params, PCM_PARAM_PERIOD_SIZE, period_size, "Period size", "Hz");
+    can_play &= check_param(params, PCM_PARAM_PERIODS, period_count, "Period count", "Hz");
+
+    pcm_params_free(params);
+
+    return can_play;
+}
+
+static int check_param(struct pcm_params *params, unsigned int param, unsigned int value,
+                 char *param_name, char *param_unit)
+{
+    unsigned int min;
+    unsigned int max;
+    int is_within_bounds = 1;
+
+    min = pcm_params_get_min(params, param);
+    if (value < min) {
+        fprintf(stderr, "%s is %u%s, device only supports >= %u%s\n", param_name, value,
+                param_unit, min, param_unit);
+        is_within_bounds = 0;
+    }
+
+    max = pcm_params_get_max(params, param);
+    if (value > max) {
+        fprintf(stderr, "%s is %u%s, device only supports <= %u%s\n", param_name, value,
+                param_unit, max, param_unit);
+        is_within_bounds = 0;
+    }
+
+    return is_within_bounds;
 }

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <signal.h>
 #include "key.h"
 #include "queue.h"
 #include "play.h"
@@ -72,6 +73,13 @@ static void InitQueue()
 	locationQueue.end = NULL;
 }
 
+static void StopThread(int sig)
+{
+    /* allow the stream to be closed gracefully */
+    signal(sig, SIG_IGN);
+    readKeyFlag = 0;
+}
+
 static int Init()
 {
 	int res;
@@ -81,6 +89,8 @@ static int Init()
 	}
 	InitPlay();
 	InitQueue();
+	
+	signal(SIGINT, StopThread);
 	
 	readKeyFlag = 1;
 	return 0;

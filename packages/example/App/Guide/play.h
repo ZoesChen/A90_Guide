@@ -1,6 +1,8 @@
 #ifndef _GUIDE_PLAY_H_
 #define _GUIDE_PLAY_H_
 #include <stdint.h>
+#include <pthread.h>
+
 /*
  * Define
  * */
@@ -12,12 +14,6 @@
 #define MUSIC_NUM1 1111
 #define MUSIC_NUM2 2222
  
-/*
- * Parameter
- * */
-pthread_mutex_t musicLock;
-pthread_cond_t musicCond;
-
 /*
  * Struct
  * */
@@ -40,6 +36,19 @@ struct chunk_fmt {
     uint16_t block_align;
     uint16_t bits_per_sample;
 };
+
+enum playStatus {
+	ENABLEPLAY,
+	DISABLEPLAY
+};
+
+/*
+ * Parameter
+ * */
+pthread_mutex_t musicLock;
+pthread_cond_t musicCond;
+
+enum playStatus playFlag;
 
 /*
  * Function

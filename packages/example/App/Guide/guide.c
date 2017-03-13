@@ -127,7 +127,8 @@ void *PlayThreadHandle(void *arg)
 		if (playCmd != PLAYCMD_INIT_STAT) {
 			//Handle playCmd && reset playCmd
 			printf("PlayThreadHandle: playCmd = %d\n", playCmd);
-			StartPlay(playCmd);
+			//StartPlay(playCmd);
+			playInterface(playCmd);
 			playCmd = PLAYCMD_INIT_STAT;
 		}
 	}

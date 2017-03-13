@@ -4,7 +4,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <pthread.h>
 #include "play.h"
 #define DEBUG
 /*
@@ -24,6 +23,7 @@ static unsigned int bits;
 static unsigned int is_raw; /* Default wav file */
 static int more_chunks;
 static int closeFlag;
+static int musicNumber = -1;
 static pthread_t musicThread;
 
 static char musicName[32][128] = {
@@ -35,6 +35,7 @@ static char musicName[32][128] = {
 /*
  * Function
  * */
+void playInterface(int mNum);
 int StartPlay(int musicNum);
 void InitPlay();
 void StopPlay();
@@ -50,6 +51,28 @@ int sample_is_playable(unsigned int card, unsigned int device, unsigned int chan
                         
 static int check_param(struct pcm_params *params, unsigned int param, unsigned int value,
                  char *param_name, char *param_unit);
+
+void playInterface(int mNum)
+{
+	if (playFlag == ENABLEPLAY) {
+		printf("%s: Now is playing\n", __FUNCTION__);
+		pthread_mutex_lock(&musicLock);
+		playFlag = DISABLEPLAY;
+		pthread_cond_wait(&musicCond, &musicLock);
+		printf("%s: Be wake up\n", __FUNCTION__);
+		pthread_mutex_unlock(&musicLock);
+	}
+
+	if (playFlag == DISABLEPLAY) {
+		printf("%s: Now is stoping\n", __FUNCTION__);
+		pthread_mutex_lock(&musicLock);
+		musicNumber = mNum;
+		playFlag = ENABLEPLAY;
+		pthread_cond_signal(&musicCond);
+		pthread_mutex_unlock(&musicLock);
+	}
+}
+
 
 int StartPlay(int musicNum)
 {
@@ -105,6 +128,74 @@ int StartPlay(int musicNum)
 	return 0;
 }
 
+void *MusicThreadHandle(void *arg) 
+{
+	while(1) {
+		pthread_mutex_lock(&musicLock);
+		pthread_cond_wait(&musicCond, &musicLock);
+		pthread_mutex_unlock(&musicLock);
+		
+		while(playFlag == ENABLEPLAY) {
+			char *musicName = NULL;
+			musicName = matchMusic(musicNumber);
+			if (musicName == NULL) {
+				printf("Can not match music!\n");
+				return -1;
+			}
+			
+			file = fopen(musicName, "rb");
+			if (file == NULL) {
+				printf("Open %s fail\n", musicName);
+				playFlag = DISABLEPLAY;
+				continue;
+			}
+
+			if (!is_raw) {
+				fread(&riffWaveHeader, sizeof(struct riff_wave_header), 1, file);
+				if ((riffWaveHeader.riff_id != ID_RIFF) || (riffWaveHeader.wave_id != ID_WAVE)) {
+					fprintf(stderr, "Error: '%s' is not a riff/wave file\n", musicName);
+					fclose(file);
+					playFlag = DISABLEPLAY;
+					continue;
+
+				}
+				do {
+					fread(&chunkHeader, sizeof(struct chunk_header), 1, file);
+					switch (chunkHeader.id) {
+		            case ID_FMT:
+		                fread(&chunkFmt, sizeof(struct chunk_fmt), 1, file);
+		                printf("%s: chunkHeader.sz = %d\n", __FUNCTION__, chunkHeader.sz);
+		                /* If the format header is larger, skip the rest */
+		                if (chunkHeader.sz > sizeof(struct chunk_fmt))
+		                    fseek(file, chunkHeader.sz - sizeof(struct chunk_fmt), SEEK_CUR);
+		                break;
+		            case ID_DATA:
+		                /* Stop looking for chunks */
+		                more_chunks = 0;
+		                break;
+		            default:
+		                /* Unknown chunk, skip bytes */
+		                fseek(file, chunkHeader.sz, SEEK_CUR);
+					}
+				} while (more_chunks);
+				channels = chunkFmt.num_channels;
+				rate = chunkFmt.sample_rate;
+				bits = chunkFmt.bits_per_sample;
+				
+			}
+
+			play_sample(file, card, device, channels, rate, bits, period_size, period_count);
+			fclose(file);
+			playFlag = DISABLEPLAY;
+		}
+		pthread_mutex_lock(&musicLock);
+		pthread_cond_signal(&musicCond);
+		pthread_mutex_unlock(&musicLock);
+	}
+	return NULL;
+}
+
+
 void InitPlay()
 {
 	device = 0;
@@ -117,6 +208,8 @@ void InitPlay()
 	is_raw = 0;
 	more_chunks = 1;
 	closeFlag = 0;
+	playFlag = DISABLEPLAY;
+	pthread_create(&musicThread, NULL, MusicThreadHandle, NULL);
 }
 
 char *matchMusic(int musicNum)
@@ -188,7 +281,6 @@ void play_sample(FILE *file, unsigned int card, unsigned int device, unsigned in
 
     do {
         num_read = fread(buffer, 1, size, file);
-        printf("%s: num_read = %d\n", __FUNCTION__, num_read);
         if (num_read > 0) {
 	    if (pcm_write(pcm, buffer, num_read)) {
                 fprintf(stderr, "Error playing sample\n");
@@ -201,8 +293,8 @@ void play_sample(FILE *file, unsigned int card, unsigned int device, unsigned in
                 break;
             }
 	}
-    } while (!closeFlag && num_read > 0);
-
+    } while ((playFlag == ENABLEPLAY) && num_read > 0);
+    playFlag = DISABLEPLAY;
     free(buffer);
     pcm_close(pcm);
 }
